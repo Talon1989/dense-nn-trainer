@@ -38,8 +38,8 @@ FORMAT_TEXT = (
 
 
 class CustomWindow(MainWindow):
-    def __init__(self, app, title):
-        super().__init__(app, title)
+    def __init__(self, title):
+        super().__init__(title)
         self._file_selection()
 
     def _file_selection(self):
@@ -227,6 +227,6 @@ class CustomWindow(MainWindow):
             )
             info_dialog.show()
             info_dialog.exec()
-            info_dialog.finished.connect(self.app.quit)
+            info_dialog.finished.connect(self.destroy)
         except Exception:
             print("unable to save model.")

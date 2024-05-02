@@ -3,9 +3,8 @@ from PySide6.QtWidgets import QMainWindow, QProgressDialog, QFileDialog, QApplic
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, application: QApplication, title: str):
+    def __init__(self, title: str):
         super().__init__()
-        self.app = application
         self.setWindowTitle(title)
         self.text_box = None
         self.csv_file = None
