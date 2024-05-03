@@ -43,10 +43,11 @@ class CustomWindow(MainWindow):
         self._file_selection()
 
     def _file_selection(self):
-        grid_layout = QVBoxLayout()
-        welcome_label = QLabel()
-        welcome_label.setText(WELCOME_TEXT)
 
+        grid_layout = QVBoxLayout()
+
+        welcome_label = QLabel(WELCOME_TEXT)
+        welcome_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         button_1 = QPushButton("Select .csv file")
         button_2 = QPushButton("Exit")
 
