@@ -14,7 +14,7 @@ def one_hot(x):  # x has to be 1D numpy array, values has to be numerical
     return Z
 
 
-class Model(nn.Module):
+class ClassificationModel(nn.Module):
     def __init__(self, in_shape: int, hidden_shape: np.array, out_shape: int):
         super().__init__()
         torch.set_default_dtype(torch.float64)
@@ -31,6 +31,25 @@ class Model(nn.Module):
         for m in self.module_list:
             x = m(x)
         output = self.sigmoid(self.output_layer(x))
+        return output
+
+
+class RegressionModel(nn.Module):
+    def __init__(self, in_shape: int, hidden_shape: np.array):
+        super().__init__()
+        torch.set_default_dtype(torch.float64)
+        self.module_list = nn.ModuleList()
+        current_shape = in_shape
+        for s in hidden_shape:
+            self.module_list.append(nn.Linear(current_shape, s))
+            self.module_list.append(nn.ReLU())
+            current_shape = s
+        self.output_layer = nn.Linear(current_shape, 1)
+
+    def forward(self, x):
+        for m in self.module_list:
+            x = m(x)
+        output = self.output_layer(x)
         return output
 
 

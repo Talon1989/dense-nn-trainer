@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QGridLayout,
     QCheckBox,
-    QRadioButton,
+    QRadioButton
 )
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import TensorDataset, DataLoader
@@ -44,7 +44,7 @@ class CustomWindow(MainWindow):
 
     def _file_selection(self):
 
-        grid_layout = QVBoxLayout()
+        layout = QVBoxLayout()
 
         welcome_label = QLabel(WELCOME_TEXT)
         welcome_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
@@ -54,12 +54,12 @@ class CustomWindow(MainWindow):
         button_1.clicked.connect(self._select_file)
         button_2.clicked.connect(QApplication.quit)
 
-        grid_layout.addWidget(welcome_label)  # span 1 row, 2 cols
-        grid_layout.addWidget(button_1)
-        grid_layout.addWidget(button_2)
+        layout.addWidget(welcome_label)  # span 1 row, 2 cols
+        layout.addWidget(button_1)
+        layout.addWidget(button_2)
 
         widget = QWidget()
-        widget.setLayout(grid_layout)
+        widget.setLayout(layout)
         self.setCentralWidget(widget)
 
     def _select_file(self):
@@ -68,9 +68,34 @@ class CustomWindow(MainWindow):
         dialog.show()
         if dialog.exec():  # selection has occurred
             self.csv_file_path = dialog.selectedFiles()[0]
+            self._type_selection()
+
+    def _type_selection(self):
+
+        def func(model_type: str):
+            self.model_type = model_type
             self._features_and_target_selection()
 
-    def _features_and_target_selection(self):  # FEATURES AND TARGET SELECTION
+        layout = QVBoxLayout()
+
+        welcome_label = QLabel('Select type of learning')
+        button_1 = QPushButton('Classification')
+        button_2 = QPushButton('Regression')
+
+        button_1.clicked.connect(lambda: func('classification'))
+        button_2.clicked.connect(lambda: func('regression'))
+
+        layout.addWidget(welcome_label, alignment=Qt.AlignmentFlag.AlignHCenter)
+        # layout.addWidget(welcome_label)
+        layout.addWidget(button_1)
+        layout.addWidget(button_2)
+        # layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
+
+    def _features_and_target_selection(self):
 
         grid_layout = QGridLayout()
 
@@ -186,9 +211,14 @@ class CustomWindow(MainWindow):
 
         x = self.csv_file.loc[:, columns].to_numpy()
         y = self.csv_file.loc[:, self.target].to_numpy()
-        y = one_hot(LabelEncoder().fit_transform(y))
 
-        model = Model(len(columns), np.array(self.nn_shape), y.shape[1])
+        if self.model_type == 'classification':
+            y = one_hot(LabelEncoder().fit_transform(y))
+            model = ClassificationModel(len(columns), np.array(self.nn_shape), y.shape[1])
+        elif self.model_type == 'regression':
+            model = RegressionModel(len(columns), np.array(self.nn_shape))
+        else:
+            print('nothing')
 
         dataset = TensorDataset(
             torch.tensor(x, dtype=torch.float64), torch.tensor(y, dtype=torch.float64)
@@ -224,7 +254,7 @@ class CustomWindow(MainWindow):
             info_dialog.setIcon(QMessageBox.Icon.Information)
             info_dialog.setWindowTitle("Model saved")
             info_dialog.setText(
-                f"Model saved locally with loss: {losses[-1]: .5f} (lower value the better)"
+                f"Model saved locally with loss: {losses[-1]: .5f}"
             )
             info_dialog.show()
             info_dialog.exec()

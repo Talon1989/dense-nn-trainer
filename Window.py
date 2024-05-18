@@ -9,6 +9,7 @@ class MainWindow(QMainWindow):
         self.text_box = None
         self.csv_file = None
         self.csv_file_path = None
+        self.model_type = None
         self.feature_dict = None
         self.target = None
         self.n_epochs = 0
