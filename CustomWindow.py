@@ -217,8 +217,6 @@ class CustomWindow(MainWindow):
             model = ClassificationModel(len(columns), np.array(self.nn_shape), y.shape[1])
         elif self.model_type == 'regression':
             model = RegressionModel(len(columns), np.array(self.nn_shape))
-        else:
-            print('nothing')
 
         dataset = TensorDataset(
             torch.tensor(x, dtype=torch.float64), torch.tensor(y, dtype=torch.float64)
